@@ -1,0 +1,43 @@
+name: Fetch Android SDK
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch platforms & build-tools
+        run: |
+          U=https://dl.google.com/android/repository
+          mkdir -p dist
+          # (url, tag, title)
+          fetch() {
+            local url=$1 tag=$2 title=$3
+            if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              echo "skip $tag"; return
+            fi
+            F=$(basename "$url")
+            curl -sL -o "$F" "$url" || { echo "FAIL $url"; return; }
+            echo "$F: $(du -m $F | cut -f1)MB"
+            gh release create "$tag" "$F" --repo "$GITHUB_REPOSITORY" --title "$title" --notes "$title"
+            rm -f "$F"
+          }
+          fetch $U/platform-26_r02.zip        "platform-26"   "Platform 26"
+          fetch $U/platform-27_r03.zip        "platform-27"   "Platform 27"
+          fetch $U/platform-28_r06.zip        "platform-28"   "Platform 28"
+          fetch $U/platform-29_r05.zip        "platform-29"   "Platform 29"
+          fetch $U/platform-30_r03.zip        "platform-30"   "Platform 30"
+          fetch $U/platform-31_r01.zip        "platform-31"   "Platform 31"
+          fetch $U/platform-32_r01.zip        "platform-32"   "Platform 32"
+          fetch $U/platform-33_r02.zip        "platform-33"   "Platform 33"
+          fetch $U/platform-34_r02.zip        "platform-34"   "Platform 34"
+          fetch $U/platform-35_r02.zip        "platform-35"   "Platform 35"
+          fetch $U/build-tools_r30.0.3-linux.zip "build-tools-30" "Build-Tools 30.0.3"
+          fetch $U/build-tools_r31-linux.zip  "build-tools-31" "Build-Tools 31"
+          fetch $U/build-tools_r32-linux.zip  "build-tools-32" "Build-Tools 32"
+          fetch $U/build-tools_r33-linux.zip  "build-tools-33" "Build-Tools 33"
+          fetch $U/build-tools_r34-linux.zip  "build-tools-34" "Build-Tools 34"
+          fetch $U/build-tools_r35-linux.zip  "build-tools-35" "Build-Tools 35"
+        env:
+          GH_TOKEN: ${{ github.token }}
