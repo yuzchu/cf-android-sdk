@@ -1,4 +1,4 @@
-name: Fetch Android SDK
+name: Fetch Android SDK (add 37)
 on:
   workflow_dispatch:
 permissions:
@@ -7,34 +7,20 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch platforms & build-tools
-        shell: bash
+      - name: Fetch platform-37 & build-tools-37
         run: |
-          set -e
           U=https://dl.google.com/android/repository
           fetch() {
             local url=$1 tag=$2 title=$3
-            if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-              echo "skip $tag (已存在)"; return
-            fi
+            if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then echo "skip $tag"; return; fi
             F=$(basename "$url")
-            curl -sL -o "$F" "$url" || { echo "FAIL $url"; return; }
+            curl -sL -o "$F" "$url"
             SZ=$(stat -c%s "$F" 2>/dev/null || echo 0)
-            if [ "$SZ" -lt 1000000 ]; then echo "FAIL $url (size=$SZ)"; rm -f "$F"; return; fi
-            echo "$F: $((SZ/1048576))MB"
-            gh release create "$tag" "$F" --repo "$GITHUB_REPOSITORY" --title "$title" --notes "$title ($url)"
+            if [ "$SZ" -lt 1000000 ]; then echo "FAIL $url"; rm -f "$F"; return; fi
+            gh release create "$tag" "$F" --repo "$GITHUB_REPOSITORY" --title "$title" --notes "$title"
             rm -f "$F"
           }
-          # platform 34-36.1
-          fetch $U/platform-34-ext7_r03.zip "platform-34" "Platform 34"
-          fetch $U/platform-35_r02.zip    "platform-35"   "Platform 35"
-          fetch $U/platform-36_r02.zip    "platform-36"   "Platform 36"
-          fetch $U/platform-36.1_r01.zip  "platform-36.1" "Platform 36.1"
-          # build-tools 34-36.1 (正确 URL 用下划线)
-          fetch $U/build-tools_r34-linux.zip    "build-tools-34"   "Build-Tools 34"
-          fetch $U/build-tools_r35_linux.zip    "build-tools-35"   "Build-Tools 35"
-          fetch $U/build-tools_r35.0.1_linux.zip "build-tools-35.0.1" "Build-Tools 35.0.1"
-          fetch $U/build-tools_r36_linux.zip    "build-tools-36"   "Build-Tools 36"
-          fetch $U/build-tools_r36.1_linux.zip  "build-tools-36.1" "Build-Tools 36.1"
+          fetch $U/platform-37.0_r02.zip "platform-37.0" "Platform 37"
+          fetch $U/build-tools_r37_linux.zip "build-tools-37" "Build-Tools 37"
         env:
           GH_TOKEN: ${{ github.token }}
