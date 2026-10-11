@@ -25,7 +25,8 @@ jobs:
             gh release create "$tag" "$F" --repo "$GITHUB_REPOSITORY" --title "$title" --notes "$title ($url)"
             rm -f "$F"
           }
-          # platform 35/36/36.1
+          # platform 34-36.1
+          fetch $U/platform-34_r02.zip    "platform-34"   "Platform 34"
           fetch $U/platform-35_r02.zip    "platform-35"   "Platform 35"
           fetch $U/platform-36_r02.zip    "platform-36"   "Platform 36"
           fetch $U/platform-36.1_r01.zip  "platform-36.1" "Platform 36.1"
